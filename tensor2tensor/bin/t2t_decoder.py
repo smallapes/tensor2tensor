@@ -56,7 +56,7 @@ flags.DEFINE_bool("decode_interactive", False,
                   "Interactive local inference mode.")
 flags.DEFINE_integer("decode_shards", 1, "Number of decoding replicas.")
 flags.DEFINE_string("score_file", "", "File to score. Each line in the file "
-                    "must be in the format input \t target.")
+                                      "must be in the format input \t target.")
 flags.DEFINE_bool("decode_in_memory", False, "Decode in memory.")
 flags.DEFINE_bool("disable_grappler_optimizations", False,
                   "Disable Grappler if need be to avoid tensor format errors.")
@@ -67,11 +67,11 @@ def create_hparams():
   if FLAGS.output_dir:
     hparams_path = os.path.join(FLAGS.output_dir, "hparams.json")
   return trainer_lib.create_hparams(
-      FLAGS.hparams_set,
-      FLAGS.hparams,
-      data_dir=os.path.expanduser(FLAGS.data_dir),
-      problem_name=FLAGS.problem,
-      hparams_path=hparams_path)
+    FLAGS.hparams_set,
+    FLAGS.hparams,
+    data_dir=os.path.expanduser(FLAGS.data_dir),
+    problem_name=FLAGS.problem,
+    hparams_path=hparams_path)
 
 
 def create_decode_hparams():
@@ -100,14 +100,14 @@ def decode(estimator, hparams, decode_hp):
       ckpt_time = os.path.getmtime(FLAGS.checkpoint_path + ".index")
       os.utime(FLAGS.decode_to_file, (ckpt_time, ckpt_time))
   else:
-    decoding.decode_from_dataset(
-        estimator,
-        FLAGS.problem,
-        hparams,
-        decode_hp,
-        decode_to_file=FLAGS.decode_to_file,
-        dataset_split="test" if FLAGS.eval_use_test_set else None,
-        checkpoint_path=FLAGS.checkpoint_path)
+    decoding.decode_from_dzataset(
+      estimator,
+      FLAGS.problem,
+      hparams,
+      decode_hp,
+      decode_to_file=FLAGS.decode_to_file,
+      dataset_split="test" if FLAGS.eval_use_test_set else None,
+      checkpoint_path=FLAGS.checkpoint_path)
 
 
 def score_file(filename):
@@ -156,7 +156,7 @@ def score_file(filename):
         inputs = tab_split[0].strip()
       # Run encoders and append EOS symbol.
       targets_numpy = encoders["targets"].encode(
-          targets) + [text_encoder.EOS_ID]
+        targets) + [text_encoder.EOS_ID]
       if has_inputs:
         inputs_numpy = encoders["inputs"].encode(inputs) + [text_encoder.EOS_ID]
       # Prepare the feed.
@@ -174,7 +174,6 @@ def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
   trainer_lib.set_random_seed(FLAGS.random_seed)
   usr_dir.import_usr_dir(FLAGS.t2t_usr_dir)
-
 
   if FLAGS.score_file:
     filename = os.path.expanduser(FLAGS.score_file)
@@ -200,11 +199,11 @@ def main(_):
   hp.add_hparam("model_dir", run_config.model_dir)
 
   estimator = trainer_lib.create_estimator(
-      FLAGS.model,
-      hp,
-      run_config,
-      decode_hparams=decode_hp,
-      use_tpu=FLAGS.use_tpu)
+    FLAGS.model,
+    hp,
+    run_config,
+    decode_hparams=decode_hp,
+    use_tpu=FLAGS.use_tpu)
 
   decode(estimator, hp, decode_hp)
 
